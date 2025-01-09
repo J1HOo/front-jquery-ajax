@@ -44,6 +44,13 @@
             $('#addColorText').click(function () {
                 $('#content').append('<p class="new-text">새롭게 추가된 컬러 텍스트 입니다.</p>');
             });
+
+            // 5. css()로 제 2순위 스타일 설정
+
+            // <style> 태그 안에 작성한 순위보다 .css() 작성한 순위가 더 높기 때문에 더 높은 순위의 css가 적용
+            $('#changeColorText').click(function () {
+                $('#content').css('color', 'red')
+            })
         });
     </script>
 </body>
