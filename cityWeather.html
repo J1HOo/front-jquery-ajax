@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>도시 날씨 정보</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #333;
+        }
+
+        header {
+            background-color: #4fc3f7;
+            color: white;
+            padding: 1.5em;
+            width: 100%;
+            text-align: center;
+            font-size: 2em;
+            font-weight: bold;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .weather-container {
+            margin: 20px;
+            padding: 20px;
+            width: 90%;
+            max-width: 500px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .weather-container input {
+            width: 80%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+
+        .weather-container button {
+            background-color: #4fc3f7;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .weather-container button:hover {
+            background-color: #29b6f6;
+        }
+
+        .weather-result {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<header>🌤 도시 날씨 정보 🌤</header>
+<div class="weather-container">
+    <input type="text" id="cityInput" placeholder="도시 이름을 입력하세요">
+    <button id="getWeather">날씨 확인</button>
+    <div class="weather-result" id="weatherResult"></div>
+    <div class="error" id="error"></div>
+</div>
+<script>
+    $(document).ready(function () {
+        // 날씨 설명을 영어에서 한글로 변환
+        const weatherKoreanDescription = {
+            "Clear": "맑음",
+            "Sunny": "맑음",
+            "Partly cloudy": "부분적으로 흐림",
+            "Cloudy": "흐림",
+            "Overcast": "구름 많음",
+            "Mist": "안개",
+            "Patchy rain possible": "부분적으로 비 가능성",
+            "Patchy snow possible": "부분적으로 눈 가능성",
+            "Patchy sleet possible": "부분적으로 진눈깨비 가능성",
+            "Patchy freezing drizzle possible": "부분적으로 어는 이슬비 가능성",
+            "Thundery outbreaks possible": "천둥 가능성",
+            "Blowing snow": "눈보라",
+            "Blizzard": "눈보라",
+            "Fog": "안개",
+            "Freezing fog": "어는 안개",
+            "Patchy light drizzle": "부분적으로 가벼운 이슬비",
+            "Light drizzle": "가벼운 이슬비",
+            "Freezing drizzle": "어는 이슬비",
+            "Heavy freezing drizzle": "강한 어는 이슬비",
+            "Patchy light rain": "부분적으로 가벼운 비",
+            "Light rain": "가벼운 비",
+            "Moderate rain at times": "때때로 중간 정도의 비",
+            "Moderate rain": "중간 정도의 비",
+            "Heavy rain at times": "때때로 강한 비",
+            "Heavy rain": "강한 비",
+            "Light freezing rain": "가벼운 어는 비",
+            "Moderate or heavy freezing rain": "중간 또는 강한 어는 비",
+            "Light sleet": "가벼운 진눈깨비",
+            "Moderate or heavy sleet": "중간 또는 강한 진눈깨비",
+            "Patchy light snow": "부분적으로 가벼운 눈",
+            "Light snow": "가벼운 눈",
+            "Patchy moderate snow": "부분적으로 중간 정도의 눈",
+            "Moderate snow": "중간 정도의 눈",
+            "Patchy heavy snow": "부분적으로 강한 눈",
+            "Heavy snow": "강한 눈",
+            "Ice pellets": "얼음 알갱이",
+            "Light rain shower": "가벼운 소나기",
+            "Moderate or heavy rain shower": "중간 또는 강한 소나기",
+            "Torrential rain shower": "폭우",
+            "Light sleet showers": "가벼운 진눈깨비 소나기",
+            "Moderate or heavy sleet showers": "중간 또는 강한 진눈깨비 소나기",
+            "Light snow showers": "가벼운 눈 소나기",
+            "Moderate or heavy snow showers": "중간 또는 강한 눈 소나기",
+            "Light showers of ice pellets": "가벼운 얼음 알갱이 소나기",
+            "Moderate or heavy showers of ice pellets": "중간 또는 강한 얼음 알갱이 소나기",
+            "Patchy light rain with thunder": "부분적으로 천둥을 동반한 가벼운 비",
+            "Moderate or heavy rain with thunder": "중간 또는 강한 천둥을 동반한 비",
+            "Patchy light snow with thunder": "부분적으로 천둥을 동반한 가벼운 눈",
+            "Moderate or heavy snow with thunder": "중간 또는 강한 천둥을 동반한 눈"
+        };
+
+        // 날씨 확인 버튼을 누르면 아래 메서드 동작
+        $('#getWeather').click(function () {
+            // 입력된 도시 이름을 가져와서 공백을 제거
+            const city = $('#cityInput').val().trim();
+            if (city === '') {
+                // 도시 이름이 입력되지 않은 경우
+                $('#error').text('도시 이름을 입력해주세요.');
+                $('#weatherResult').empty();
+                return;
+            }
+
+            const apiUrl = `https://goweather.herokuapp.com/weather/${city}`;
+            $.ajax({
+                url: apiUrl,
+                method: 'GET',
+                success: function (data) {
+                    if (data.description || data.temperature || data.wind) {
+                        // 날씨 설명을 한글로 변환하는 로직 영어로 된 설명을 비우고 한글로 갈아 끼우기
+                        const description = weatherKoreanDescription[data.description.trim()] || data.description;
+                        // 날씨 정보를 화면에 표시
+                        $('#weatherResult').html(`
+              <p>온도: ${data.temperature}</p>
+              <p>바람: ${data.wind}</p>
+              <p>날씨 설명: ${description}</p>
+            `);
+                        $('#error').empty(); // 정상 작동시 에러 내용이 있었다면 지우기
+                    } else {
+                        $('#error').text('유효한 도시 이름을 입력해주세요.');
+                        $('#weatherResult').empty();
+                    }
+                },
+                error: function () {
+                    $('#error').text('날씨 정보를 가져오는데 실패했습니다. 다시 시도해주세요.');
+                    $('#weatherResult').empty();
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
