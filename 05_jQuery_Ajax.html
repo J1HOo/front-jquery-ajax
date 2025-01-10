@@ -61,22 +61,26 @@
 <button id="loadCat">고양이 사진 가져오기</button>
 <div id="catContainer"></div>
 
-<script>
-    $('#loadCat').click(function () {
+    <script>
+        $('#loadCat').click(function () {
         $.ajax({
             url: 'https://api.thecatapi.com/v1/images/search?limit=1',
             method: 'GET',
             success: function (data) {
-                $('#catContainer').empty();
-                $('#catContainer').append(
-                    '<img class="image-item" src="' + data[0].url + '" >'
-                );
+                $('#catContainer').empty(); // 이전 이미지 제거하기
+                if (data.length > 0) { // 고양이 사진이 1장 이상일 때
+                    const catUrl = data[0].url;
+                    $('#catContainer').append('<img class="image-item" src="' + catUrl + '" >');
+                } else {
+                    // $('#catContainer').html('<p>고양이 사진이 0장 입니다.</p>'); // 고양이 사진이 0장일 때
+                    $('#catContainer').html(`<p>고양이 사진이 ${data.length} 습니다.</p>`);
+                }
             },
             error: function () {
                 $('#catContainer').html('<p>고양이 사진을 가져오는 데 실패했습니다.</p>');
             }
         });
     });
-</script>
+    </script>
 </body>
 </html>
