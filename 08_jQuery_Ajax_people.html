@@ -4,75 +4,111 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>jQuery_Ajax_people</title>
-  <style>
-    body {
-      background-color: #f0f2f5;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+    <style>
+        body {
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-    header {
-      background-color: #4267b2;
-      color: white;
-      padding: 1em;
-      width: 100%;
-      text-align: center;
-      font-size: 1.8em;
-      font-weight: bold;
-    }
+        header {
+            background-color: #4267b2;
+            color: white;
+            padding: 1em;
+            width: 100%;
+            text-align: center;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
 
-    .profile-container {
-      margin: 20px;
-      padding: 20px;
-      width: 90%;
-      max-width: 400px;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-      text-align: center;
-    }
+        .profile-container {
+            margin: 20px;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
 
-    .profile-container img {
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    }
+        .profile-container img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
 
-    .profile-container h2 {
-      margin: 15px 0 5px;
-      font-size: 1.5em;
-      color: #333;
-    }
+        .profile-container h2 {
+            margin: 15px 0 5px;
+            font-size: 1.5em;
+            color: #333;
+        }
 
-    .profile-container p {
-      font-size: 1em;
-      color: #555;
-      margin: 5px 0;
-    }
+        .profile-container p {
+            font-size: 1em;
+            color: #555;
+            margin: 5px 0;
+        }
 
-    .profile-container button {
-      background-color: #4267b2;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 10px 20px;
-      font-size: 1em;
-      cursor: pointer;
-      margin-top: 15px;
-      transition: background-color 0.3s ease;
-    }
+        .profile-container button {
+            background-color: #4267b2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background-color 0.3s ease;
+        }
 
-    .profile-container button:hover {
-      background-color: #365899;
-    }
-  </style>
+        .profile-container button:hover {
+            background-color: #365899;
+        }
+    </style>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 <body>
-
+<div class="profile-container">
+    <img id="profilePic" src="" alt="profile">
+    <h2 id="profileName">이름</h2>
+    <p id="profileEmail">이메일</p>
+    <p id="profileLocation">위치</p>
+    <button id="loadProfile">새로운 프로필 보기</button>
+</div>
 </body>
+<script>
+    function functionProfile() {
+        $.ajax({
+            url: 'https://randomuser.me/api/',
+            method: 'GET',
+            success: function (data) {
+              // 데이터가 results 안에 배열 형식으로 저장되어 있으므로 data.results[0]으로 접근
+              const user = data.results[0];
+
+                $('#profilePic').attr('src', user.picture.large);
+                $('#profileName').text(user.name.first + ' ' + user.name.last);
+                $('#profileEmail').text(user.email);
+                $('#profileLocation').text(user.location.city + ', ' + user.location.country);
+
+
+            },
+            error: function () {
+                alert('프로필 데이터를 불러오는데 실패했습니다. 다음에 다시 시도해주세요.');
+            }
+        });
+    }
+
+    // 초기 프로필 불러오기
+    functionProfile();
+
+    // 버튼 클릭시 새로운 프로필 가져오기
+    $('#loadProfile').click(function () {
+        functionProfile();
+    });
+</script>
 </html>
