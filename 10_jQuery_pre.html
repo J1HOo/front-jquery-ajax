@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>jQuery Example</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        .today-products {
+            margin-top: 20px;
+            padding: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<select id="category" name="category">
+    <option value="ALL" selected>ALL</option>
+    <option value="TOP">TOP</option>
+    <option value="BOTTOM">BOTTOM</option>
+    <option value="ACC">ACC</option>
+</select>
+
+<input type="text" name="query" value="" id="query">
+
+<button id="search-button">검색</button>
+
+<div class="today-products">
+    <ul>
+        <li>상품 1</li>
+        <li>상품 2</li>
+        <li>상품 3</li>
+        <li>상품 4</li>
+        <li>상품 5</li>
+    </ul>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#search-button').on('click', function () {
+            const category = $('#category').val();
+            const query = $('#query').val().trim();
+
+            if (category !== 'ALL' || query) { // 카테고리 내용이 All이 아니거나 검색어 내용이 있다면 히든 처리
+                $('.today-products').addClass('hidden');
+            } else {
+                $('.today-products').removeClass('hidden');
+            }
+        });
+    });
+</script>
+</body>
+</html>
