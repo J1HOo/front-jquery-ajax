@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>칵테일 레시피</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <style>
+        .container {
+            max-width: 600px;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 0 500px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid gray;
+            border-radius: 5px;
+            font-size: 15px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 15px;
+            width: 100%;
+        }
+
+        .result {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .result img {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>칵테일 레시피 검색</h1>
+    <input type="text" id="cocktail-input" placeholder="칵테일 레시피명을 입력">
+    <button id="search-button">검색</button>
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+    $('#search-button').click(function () {
+        const cocktailName = $('#cocktail-input').val().trim();
+
+        if (!cocktailName) {
+            $('#result').html('<p>칵테일 이름을 입력해주세요.</p>');
+            return;
+        }
+        $.ajax({
+            url: `https://www.thecocktaildb.com/api/json/v1/1/search.php?s=${cocktailName}`,
+            method: 'GET',
+            success: function (data) {
+                if (data.drinks) {
+                    $('#result').empty()
+
+                    $.each(data.drinks, function (index, drink) {
+                        $('#result').append(`
+                                <h2>${drink.strDrink}</h2>
+                                <img src="${drink.strDrinkThumb}">
+                                <p>카테고리: ${drink.strCategory}</p>
+                                <p>잔: ${drink.strGlass}</p>
+                                <p>레시피: ${drink.strInstructions}</p>
+                                <p>재료: ${drink.strIngredient1}</p>
+                                <p>재료: ${drink.strIngredient2}</p>
+                                <p>재료: ${drink.strIngredient3}</p>
+                                <p>재료: ${drink.strIngredient4}</p>
+                                <p>재료: ${drink.strIngredient5}</p>
+
+                        `); // 재료를 배열로 가져오도록 로직 추가 필요한데 어떤식으로 처리해주면 좋을지
+                    });
+                } else {
+                    $('#result').html('<p>존재하지 않는 칵테일 입니다.</p>');
+                }
+            },
+            error: function () {
+                $('#result').html('<p>API를 불러오지 못했습니다.</p>');
+            }
+        });
+    });
+</script>
+</body>
+</html>
